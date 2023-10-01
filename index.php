@@ -40,7 +40,7 @@ if ($result = $conn->query($sql)) {
         $row_Timestamp = $row["Timestamp"];
         
 
-      
+      #testpush
         echo '<tr> 
                 <td>' . $row_id . '</td> 
                 <td>' . $row_SoilMoisture . '</td> 
