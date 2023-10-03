@@ -1,62 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="5" >
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
-
-	<title> SmartDilig - Sensor Data </title>
+     <link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartDilig Navigation</title>
 
 </head>
-
 <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>SmartDilig</h2>
+        <a href="">Dashboard</a>
+        <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
+    </div>
 
-    <h1>SENSOR DATA</h1>
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "nodemcu test";
+    <!-- Content -->
+    <div class="content" id="contentContainer">
+        <h1>Welcome to SmartDilig</h1>
+        <p>This is the SmartDilig dashboard and sensor data page.</p>
+    </div>
 
+    <script>
+        // JavaScript code to load SensorData.php into the content area
+        const sensorDataLink = document.getElementById("sensorDataLink");
+        const contentContainer = document.getElementById("contentContainer");
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$sql = "SELECT ID, SoilMoisture, Timestamp FROM soil_moisture_data ORDER BY id DESC";
-
-echo '<table cellspacing="5" cellpadding="5">
-      <tr> 
-        <th>ID</th> 
-        <th>Soil Moisture</th> 
-        <th>Time & Date</th>       
-      </tr>';
- 
-if ($result = $conn->query($sql)) {
-    while ($row = $result->fetch_assoc()) {
-        $row_id = $row["ID"];
-        $row_SoilMoisture = $row["SoilMoisture"]. '%';
-        $row_Timestamp = $row["Timestamp"];
-        
-
-      #testpush
-        echo '<tr> 
-                <td>' . $row_id . '</td> 
-                <td>' . $row_SoilMoisture . '</td> 
-                <td>' . $row_Timestamp . '</td> 
-                
-              </tr>';
-    }
-    $result->free();
-}
-
-$conn->close();
-?> 
-</table>
-
+        sensorDataLink.addEventListener("click", function(event) {
+            event.preventDefault();
+            // Load the content from SensorData.php into the content container
+            fetch("SensorData.php")
+                .then(response => response.text())
+                .then(data => {
+                    contentContainer.innerHTML = data;
+                })
+                .catch(error => {
+                    contentContainer.innerHTML = "<p>Error loading Sensor Data.</p>";
+                });
+        });
+    </script>
 </body>
-</html>
-
-	</body>
 </html>

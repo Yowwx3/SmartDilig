@@ -29,3 +29,33 @@ font-size: 15px;
 text-align: center;
 border: 1px solid #DDD;
 }
+
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #333;
+    padding-top: 20px;
+    color: #fff;
+}
+
+.sidebar a {
+    padding: 15px;
+    padding-left: 30px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #fff;
+    display:flex;
+}
+
+.sidebar a:hover {
+    background-color: #555;
+}
+
+/* Content styles */
+.content {
+    margin-left: 270px;
+    padding: 20px;
+}
