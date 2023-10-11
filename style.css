@@ -1,44 +1,59 @@
-
 body {
-    background: #e0eaf5;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(to bottom right, #bddcf2, #ffffff); /* Gradient from top left to bottom right */
     box-sizing: border-box;
-    color: #000;
-    font-size: 1.8rem;
+    color: #333;
+    font-size: 1.5rem;
     letter-spacing: -0.015em;
     text-align: center;
+    margin: 0;
 }
+
+.welcome {
+    font-family: Verdana, Geneva, Tahoma, sans-serif; /* Replace 'Your Custom Font' with your desired font */
+    font-size: 36px;
+    cursor: default;
+    color: #343643;
+    text-align: center;
+    margin-top: 20px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(84, 79, 101, 0.5);
+}
+
+
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
 table {
-margin-left: auto;
-margin-right: auto;
-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
 }
 
 th {
-font-family: Arial, Helvetica, sans-serif;
-font-size: 20px;
-background: #666;
-color: #FFF;
-padding: 2px 6px;
-border-collapse: separate;
-border: 1px solid #000;
+    font-size: 20px;
+    background: #a9c7d3; /* Pastel blue-gray header background color */
+    color: #333; /* Dark gray text color */
+    padding: 10px 15px;
+    border-collapse: separate;
+    border: 1px solid #000;
 }
 
 td {
-font-family: Arial, Helvetica, sans-serif;
-font-size: 15px;
-text-align: center;
-border: 1px solid #DDD;
+    font-size: 15px;
+    text-align: center;
+    border: 1px solid #a9c7d3; /* Matching border color */
 }
 
 .sidebar {
-    height: 100%;
-    width: 250px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: #333;
+    width: 20%;
+    background-color: #6b8b99; /* Darker blue-gray sidebar background color */
     padding-top: 20px;
-    color: #fff;
+    padding-bottom: 100%;
+    color: #fff; /* White text color for better contrast */
 }
 
 .sidebar a {
@@ -46,16 +61,188 @@ border: 1px solid #DDD;
     padding-left: 30px;
     text-decoration: none;
     font-size: 18px;
-    color: #fff;
-    display:flex;
+    color: #fff; /* White text color for better contrast */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .sidebar a:hover {
-    background-color: #555;
+    background-color: #4a6470; /* Slightly darker blue-gray on hover */
 }
+
+
 
 /* Content styles */
 .content {
-    margin-left: 270px;
-    padding: 20px;
+    padding: 10px;
+    width: 90%;
+}
+
+.box1div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 20px;
+    width: 180px;
+    height: 80px;
+    background-color: #f8f8f8; /* Very light gray background */
+    font-size: 1.4rem;
+    border-radius: 5px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#averageMoisturePercentage {
+    font-weight: bold;
+}
+
+#averageMoistureBox {
+    background-color: #b8e0a8; /* Pastel green */
+}
+
+#averageNitrogenBox {
+    background-color: #f9c781; /* Pastel orange */
+}
+
+#averagePhosphorusBox {
+    background-color: #d5b3e4; /* Pastel lavender */
+}
+
+#averagePotassiumBox {
+    background-color: #a6d4e9; /* Pastel light blue */
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a,
+.pagination span,
+.pagination input {
+    padding: 5px 10px;
+    margin: 0 2px;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* Set a fixed width for items with three digits */
+.pagination a, .pagination span {
+    min-width: 40px; /* Adjust the width as needed */
+}
+
+.pagination .current {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.pagination input[type="number"] {
+    width: 40px;
+    height: 18px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+/* Style the range input */
+input[type="range"] {
+    appearance: none; /* Remove the default styling */
+    background: linear-gradient(to right, #c5dfea, #2e85cc); /* Define a gradient background */
+    border-radius: 1em;
+    outline: none; /* Remove the default outline */
+    transition: opacity 1s; /* Add a transition effect for smooth changes */
+    width: 60px;
+    cursor: pointer;
+  }
+  
+  /* Style the thumb (slider handle) */
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 2em;
+    height: 2em;
+    background: white; /* Change the background color to white */
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Style the label for the irrigation switch */
+  label[for="httpSlider"] {
+
+    font-size: 1em;
+    margin-right: 10px;
+    color: #333;
+  }
+  
+
+
+@media screen and (max-width: 965px) {
+    body {
+        font-size: 1rem;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sidebar {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        padding-bottom: 20px;
+    }
+
+    .sidebar a {
+        padding: 25px 8px;
+        text-decoration: none;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .sidebar h2 {
+        padding: 0px 8px;
+    }
+
+    table {
+        max-width: 100%;
+    }
+
+    th {
+        font-size: 17px;
+        padding: 10px 5px;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
 }
