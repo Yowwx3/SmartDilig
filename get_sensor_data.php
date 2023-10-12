@@ -10,7 +10,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT ID, SoilMoisture, Timestamp FROM soil_moisture_data ORDER BY id DESC";
+$sql = "SELECT * FROM soil_moisture_data ORDER BY id DESC";
 
 $data = array();
 
@@ -19,6 +19,9 @@ if ($result = $conn->query($sql)) {
         $data[] = array(
             "ID" => $row["ID"],
             "SoilMoisture" => $row["SoilMoisture"] . '%',
+            "Nitrogen" => $row["Nitrogen"] . ' mg/kg',
+            "Phosphorus" => $row["Phosphorus"] . ' mg/kg',
+            "Potassium" => $row["Potassium"] . ' mg/kg',
             "Timestamp" => $row["Timestamp"]
         );
     }
