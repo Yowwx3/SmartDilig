@@ -9,8 +9,9 @@ $dbname = "nodemcu test";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $value1 = test_input($_POST["value1"]);
-
-    
+        $value2 = test_input($_POST["value2"]);
+        $value3 = test_input($_POST["value3"]);
+        $value4 = test_input($_POST["value4"]);
 
         $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -18,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Connection failed: " . $conn->connect_error);
         } 
         
-        $sql = "INSERT INTO soil_moisture_data (SoilMoisture) VALUES ('" . $value1 . "')";
+        $sql = "INSERT INTO soil_moisture_data (SoilMoisture, Nitrogen, Phosphorus, Potassium) VALUES ('$value1', '$value2', '$value3', '$value4')";
        
         
         if ($conn->query($sql) === TRUE) {

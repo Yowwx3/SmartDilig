@@ -1,3 +1,13 @@
+<?php 
+session_start();
+
+	include("connection.php");
+	include("functions.php");
+
+	$user_data = check_login($con);
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,13 +22,58 @@
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
-        <h2>SmartDilig</h2>
+        <div class="header">
+        <img class="logo" src="images/logo.png" alt="Logo">
+    <h2>
+        SmartDilig
+    </h2>
+    </div>
         <a href="/SmartDilig">Dashboard</a>
         <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
+        <a href="logout.php">Logout</a>
+    </div>
+    <div class="content" id="contentContainer">
+    <div class="clock">
+    <script>
+    // Function to update the status text and font color
+    function updateStatus() {
+      var statusElement = document.querySelector('.dstatus');
+      var apiUrl = "https://sgp1.blynk.cloud/external/api/isHardwareConnected?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9";
+
+      // Make a GET request
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data === true) {
+            statusElement.textContent = "Online";
+            statusElement.classList.remove("offline");
+            statusElement.classList.add("online");
+          } else {
+            statusElement.textContent = "Offline";
+            statusElement.classList.remove("online");
+            statusElement.classList.add("offline");
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching data:", error);
+          statusElement.textContent = "Offline"; // Set to "Offline" in case of an error
+          statusElement.classList.remove("online");
+          statusElement.classList.add("offline");
+        });
+    }
+
+    // Call the function when the page loads
+    window.onload = updateStatus;
+  </script>
+ <h5 class="dstatus offline"></h5>
+
+
+    </script>
+        <div id="time"></div>
+        <script src="clock.js"></script>
     </div>
 
-    <!-- Content -->
-    <div class="content" id="contentContainer">
+  
         <h2 class="welcome">SENSOR DATA</h2>
         <?php
         $servername = "localhost";
@@ -39,29 +94,40 @@
         // Calculate the OFFSET for SQL query
         $offset = ($currentPage - 1) * $resultsPerPage;
 
-        $sql = "SELECT ID, SoilMoisture, Timestamp FROM soil_moisture_data ORDER BY id DESC LIMIT $resultsPerPage OFFSET $offset";
+        $sql = "SELECT * FROM soil_moisture_data ORDER BY id DESC LIMIT $resultsPerPage OFFSET $offset";
 
         echo '<table cellspacing="3" cellpadding="3">
               <tr> 
                 <th>ID</th> 
                 <th>Soil Moisture</th> 
+                <th>Nitrogen</th> 
+                <th>Phosphorus</th> 
+                <th>Potassium</th> 
                 <th>Time & Date</th>       
               </tr>';
         
-        if ($result = $conn->query($sql)) {
-            while ($row = $result->fetch_assoc()) {
-                $row_id = $row["ID"];
-                $row_SoilMoisture = $row["SoilMoisture"]. '%';
-                $row_Timestamp = $row["Timestamp"];
-
-                echo '<tr> 
-                        <td>' . $row_id . '</td> 
-                        <td>' . $row_SoilMoisture . '</td> 
-                        <td>' . $row_Timestamp . '</td> 
-                      </tr>';
+              if ($result = $conn->query($sql)) {
+                while ($row = $result->fetch_assoc()) {
+                    $row_id = $row["ID"];
+                    $row_SoilMoisture = $row["SoilMoisture"] . '%';
+                    $row_Nitrogen = $row["Nitrogen"] . ' mg/kg';
+                    $row_Phosphorus = $row["Phosphorus"] . ' mg/kg';
+                    $row_Potassium = $row["Potassium"] . ' mg/kg';
+                    $row_Timestamp = $row["Timestamp"];
+            
+            
+                    echo '<tr> 
+                            <td>' . $row_id . '</td> 
+                            <td>' . $row_SoilMoisture . '</td>
+                            <td>' . $row_Nitrogen . '</td>
+                            <td>' . $row_Phosphorus . '</td>
+                            <td>' . $row_Potassium . '</td>
+                            <td>' . $row_Timestamp . '</td> 
+                          </tr>';
+                }
+                $result->free();
             }
-            $result->free();
-        }
+            
 
         // Pagination navigation
         echo '</table>';
