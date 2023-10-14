@@ -18,7 +18,8 @@ session_start();
     <meta http-equiv="refresh" content="10000">
     <title>SmartDilig</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="functions.js"></script>
 
 </head>
 <body>
@@ -41,46 +42,18 @@ session_start();
     <!-- Content -->
     <div class="content" id="contentContainer">
     <div class="clock">
-    <script>
-    // Function to update the status text and font color
-    function updateStatus() {
-      var statusElement = document.querySelector('.dstatus');
-      var apiUrl = "https://sgp1.blynk.cloud/external/api/isHardwareConnected?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9";
 
-      // Make a GET request
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          if (data === true) {
-            statusElement.textContent = "Online";
-            statusElement.classList.remove("offline");
-            statusElement.classList.add("online");
-          } else {
-            statusElement.textContent = "Offline";
-            statusElement.classList.remove("online");
-            statusElement.classList.add("offline");
-          }
-        })
-        .catch(error => {
-          console.error("Error fetching data:", error);
-          statusElement.textContent = "Offline"; // Set to "Offline" in case of an error
-          statusElement.classList.remove("online");
-          statusElement.classList.add("offline");
-        });
-    }
-
-    // Call the function when the page loads
-    window.onload = updateStatus;
-  </script>
  <h5 class="dstatus offline"></h5>
 
 
     </script>
         <div id="time"></div>
-        <script src="clock.js"></script>
+        <?php if (isset($user_data['username'])) : ?>
+                <div><?php echo $user_data['username']; ?></div>
+                <?php endif; ?> 
     </div>
 
-        <h1 class="welcome">Welcome to SmartDilig</h1>
+        <h1 class="welcome">SmartDilig Dashboard</h1>
 
 
         <div class="switchdiv">
@@ -155,9 +128,14 @@ session_start();
         });
     </script>
 
-
-
+<div class="filters">
+    <h4 id="dayDataButton" onclick="setDataSource('day')"><a href="/SmartDilig">Show Daily Data </a></h4>
+    <h4 id="weekDataButton" onclick="setDataSource('week')"><a href="/SmartDilig">Show Weekly Data </a></h4>
+    <h4 id="monthDataButton" onclick="setDataSource('month')"><a href="/SmartDilig">Show Monthly Data</a></h4>
+</div>
+    
 <div class="box1div">
+
     <!-- Four boxes -->
     <div class="box" id="averageMoistureBox">
         Avg Soil Moisture:<br><span id="averageMoisturePercentage">Loading...</span>
@@ -172,104 +150,28 @@ session_start();
         Avg Potassium:<br><span id="averagePotassium">Loading...</span>
     </div>
 </div>
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "nodemcu test";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$sql = "SELECT * FROM soil_moisture_data ORDER BY id DESC";
-
-$dataPoints = array();
-
-if ($result = $conn->query($sql)) {
-    while ($row = $result->fetch_assoc()) {
-        $dataPoints[] = array(
-            "y" => (float)$row["SoilMoisture"],
-            "label" => $row["Timestamp"]
-        );
-    }
-    $result->free();
-}
-
-$conn->close();
-
-
-
-?>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to fetch and display average values
-    function fetchAndDisplayAverages() {
-        // Fetch sensor data using AJAX
-        fetch("get_sensor_data.php")
-            .then(response => response.json())
-            .then(data => {
-                // Process your data here and prepare it for the chart
-                // Example: Extract timestamp and soil moisture values
-                const chartData = data.map(item => ({
-                    x: new Date(item.Timestamp), // Assuming Timestamp is a date or timestamp
-                    y: parseFloat(item.SoilMoisture), // Parse as a float
-                    toolTipContent: `<strong>Timestamp:</strong> {x}<br><strong>Soil Moisture:</strong> {y}%` // Customize tooltip format
-                }));
-
-                // Define the chart configuration
-                var chart = new CanvasJS.Chart("chartContainer", {
-                    theme: "light2",
-                    title: {
-                        text: "Soil Moisture Data"
-                    },
-                    axisX: {
-                        title: "Timestamp",
-                        valueFormatString: "DD/MMM/YYYY " // Format x-values as desired
-                    },
-                    axisY: {
-                        title: "Soil Moisture (%)"
-                    },
-                    data: [{
-                        type: "line",
-                        dataPoints: chartData
-                    }]
-                });
-
-                // Render the chart
-                chart.render();
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error);
-            });
-    }
-
-    // Fetch and display average values and update the chart when the page loads
-    fetchAndDisplayAverages();
-});
-
-
-</script>
-<div id="chartContainer" style="height: 300px; width: 400px;"></div>
-<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-
+<div class="chart-container">
+    <h5>Soil Moisture and Nutrient Data Chart</h5>
+    <canvas id="line-chart"></canvas>
 </div>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const sensorDataLink = document.getElementById("sensorDataLink");
+    const dayDataButton = document.getElementById("dayDataButton");
+    const weekDataButton = document.getElementById("weekDataButton");
+    const monthDataButton = document.getElementById("monthDataButton");
     const averageMoistureBox = document.getElementById("averageMoistureBox");
     const averageNitrogenBox = document.getElementById("averageNitrogenBox");
     const averagePhosphorusBox = document.getElementById("averagePhosphorusBox");
     const averagePotassiumBox = document.getElementById("averagePotassiumBox");
 
     // Function to fetch and display average values
-    function fetchAndDisplayAverages() {
+    function fetchAndDisplayAverages(dataFile) {
         // Fetch sensor data using AJAX
-        fetch("get_sensor_data.php")
+        fetch(dataFile)
             .then(response => response.json())
             .then(data => {
                 // Calculate the averages
@@ -298,18 +200,149 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    // Event listener for "Show Daily Data" button
+    dayDataButton.addEventListener("click", function () {
+        fetchAndDisplayAverages("get_sensor_data_day.php");
+        // Store the selected data source in localStorage
+        localStorage.setItem("selectedDataSource", "day");
+    });
 
-    // Fetch and display average values when the page loads
-    fetchAndDisplayAverages();
+    // Event listener for "Show Weekly Data" button
+    weekDataButton.addEventListener("click", function () {
+        fetchAndDisplayAverages("get_sensor_data_week.php");
+        // Store the selected data source in localStorage
+        localStorage.setItem("selectedDataSource", "week");
+    });
+
+       // Event listener for "Show Monthly Data" button (similar to other buttons)
+    monthDataButton.addEventListener("click", function () {
+        fetchAndDisplayAverages("get_sensor_data_month.php"); // Use the PHP file for monthly data
+        // Store the selected data source in localStorage
+        localStorage.setItem("selectedDataSource", "month");
+    });
+
+    // Check localStorage for the selected data source and load accordingly
+    const selectedDataSource = localStorage.getItem("selectedDataSource");
+    if (selectedDataSource === "week") {
+        weekDataButton.click(); // Trigger a click event to load weekly data
+    } else if (selectedDataSource === "month") {
+        monthDataButton.click(); // Trigger a click event to load weekly data
+    } else {
+        dayDataButton.click(); // Default to daily data
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sensorDataLink = document.getElementById("sensorDataLink");
+    const averageMoistureBox = document.getElementById("averageMoistureBox");
+    const averageNitrogenBox = document.getElementById("averageNitrogenBox");
+    const averagePhosphorusBox = document.getElementById("averagePhosphorusBox");
+    const averagePotassiumBox = document.getElementById("averagePotassiumBox");
+    
+    // Function to set the selected data source and update the chart container
+// Function to set the selected data source and update the chart container
+function setDataSource(dataSource) {
+    localStorage.setItem("selectedDataSource", dataSource); // Store selected data source
+    if (dataSource === "day") {
+        fetchAndDisplayAverages("get_sensor_data_day.php");
+    } else if (dataSource === "week") {
+        fetchAndDisplayAverages("get_sensor_data_week.php");
+    } else if (dataSource === "month") {
+        fetchAndDisplayAverages("get_sensor_data_month.php");
+    }
+}
+
+
+    // Function to fetch and display average values
+    function fetchAndDisplayAverages(dataFile) {
+        // Fetch sensor data using AJAX
+        fetch(dataFile)
+            .then(response => response.json())
+            .then(dataPoints => {
+                var phpData = dataPoints;
+
+                // Map and format the timestamp to display only the date
+                var labels = phpData.map(item => {
+                    var timestamp = new Date(item.label);
+                    return timestamp.toLocaleDateString();
+                });
+
+                var ctx = document.getElementById("line-chart").getContext('2d');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels, // Use the formatted date values
+                        datasets: [
+                            {
+                                data: phpData.map(item => item.SoilMoisture),
+                                label: "Soil Moisture",
+                                borderColor: "#00BFFF",
+                                fill: false
+                            },
+                            {
+                                data: phpData.map(item => item.Nitrogen),
+                                label: "Nitrogen",
+                                borderColor: "#00A36C",
+                                fill: false
+                            },
+                            {
+                                data: phpData.map(item => item.Phosphorus),
+                                label: "Phosphorus",
+                                borderColor: "#FF5733",
+                                fill: false
+                            },
+                            {
+                                data: phpData.map(item => item.Potassium),
+                                label: "Potassium",
+                                borderColor: "#FFC300",
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        animation: false,
+                        title: {
+                            display: true,
+                            text: 'Soil Moisture and Nutrient Data Chart'
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+    }
+
+    // Fetch and display the chart based on the selected data source
+    const selectedDataSource = localStorage.getItem("selectedDataSource");
+    if (selectedDataSource) {
+        setDataSource(selectedDataSource); // Set data source based on local storage
+        
+    } else {
+        // Default to "day" if not set in local storage
+        setDataSource("day");
+    }
 
     // The "Sensor Data" link should work as expected without preventing default behavior
 });
+
+
+
 </script>
+
+
+
+</div>
+
 
 </body>
 </html>
+
 <!-- https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2&value=0 -->
 <!-- https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2&value=1 -->
-<!-- https://sgp1.blynk.cloud/external/api/get?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2
- -->
+<!-- https://sgp1.blynk.cloud/external/api/get?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2-->
  <!-- https://sgp1.blynk.cloud/external/api/isHardwareConnected?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9 -->

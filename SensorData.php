@@ -70,7 +70,10 @@ session_start();
 
     </script>
         <div id="time"></div>
-        <script src="clock.js"></script>
+        <script src="functions.js"></script>
+        <?php if (isset($user_data['username'])) : ?>
+                <div><?php echo $user_data['username']; ?></div>
+                <?php endif; ?> 
     </div>
 
   
@@ -94,7 +97,7 @@ session_start();
         // Calculate the OFFSET for SQL query
         $offset = ($currentPage - 1) * $resultsPerPage;
 
-        $sql = "SELECT * FROM soil_moisture_data ORDER BY id DESC LIMIT $resultsPerPage OFFSET $offset";
+        $sql = "SELECT ID, SoilMoisture, Nitrogen, Phosphorus, Potassium, DATE_FORMAT(Timestamp, '%Y-%m-%d %h:%i %p') AS FormattedTimestamp FROM soil_moisture_data ORDER BY ID DESC LIMIT $resultsPerPage OFFSET $offset";
 
         echo '<table cellspacing="3" cellpadding="3">
               <tr> 
@@ -113,7 +116,7 @@ session_start();
                     $row_Nitrogen = $row["Nitrogen"] . ' mg/kg';
                     $row_Phosphorus = $row["Phosphorus"] . ' mg/kg';
                     $row_Potassium = $row["Potassium"] . ' mg/kg';
-                    $row_Timestamp = $row["Timestamp"];
+                    $row_Timestamp = $row["FormattedTimestamp"];
             
             
                     echo '<tr> 
