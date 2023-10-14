@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // Something was posted
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $email = $_POST['email'];
 
     if (!empty($username) && !empty($password) && !is_numeric($username)) {
         // Check if the username already exists
@@ -21,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $user_id = random_num(20);
             $query = "INSERT INTO users (username, password, email) VALUES ('$username', '$password', '$email')";
             mysqli_query($con, $query);
+            echo '<script>alert("Account successfully created"); setTimeout(function(){ window.location = "login.php"; }, 100);</script>';
 
-            header("Location: login.php");
             die;
         }
     } else {

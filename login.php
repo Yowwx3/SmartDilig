@@ -1,48 +1,37 @@
-<?php 
-
+<?php
 session_start();
+include("connection.php");
+include("functions.php");
 
-	include("connection.php");
-	include("functions.php");
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    // Something was posted
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
+    if (!empty($username) && !empty($password)) {
+        // Check if the username exists
+        $query = "SELECT * FROM users WHERE username = '$username'";
+        $result = mysqli_query($con, $query);
 
-	if($_SERVER['REQUEST_METHOD'] == "POST")
-	{
-		//something was posted
-		$username = $_POST['username'];
-		$password = $_POST['password'];
+        if (mysqli_num_rows($result) == 1) {
+            $user_data = mysqli_fetch_assoc($result);
 
-		if(!empty($username) && !empty($password) && !is_numeric($username))
-		{
-
-			//read from database
-			$query = "select * from users where username = '$username' limit 1";
-			$result = mysqli_query($con, $query);
-
-			if($result)
-			{
-				if($result && mysqli_num_rows($result) > 0)
-				{
-
-					$user_data = mysqli_fetch_assoc($result);
-					
-					if($user_data['password'] === $password)
-					{
-
-						$_SESSION['id'] = $user_data['id'];
-						header("Location: index.php");
-						die;
-					}
-				}
-			}
-			
-			echo '<script>alert("Wrong username or password!");</script>';
-		}else
-		{
-			echo '<script>alert("Wrong username or password!");</script>';
-		}
-	}
-
+            // Check if the password is correct
+            if($user_data['password'] === $password) {
+                // Password is correct, so log in the user
+                $_SESSION['id'] = $user_data['id'];
+                header("Location: index.php");
+                die;
+            } else {
+                echo '<script>alert("Wrong password. Please try again.");</script>';
+            }
+        } else {
+            echo '<script>alert("Username does not exist. Please sign up for an account.");</script>';
+        }
+    } else {
+        echo '<script>alert("Please enter both username and password.");</script>';
+    }
+}
 ?>
 
 <!DOCTYPE html>
