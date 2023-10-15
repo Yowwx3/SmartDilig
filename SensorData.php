@@ -97,7 +97,7 @@ session_start();
         // Calculate the OFFSET for SQL query
         $offset = ($currentPage - 1) * $resultsPerPage;
 
-        $sql = "SELECT ID, SoilMoisture, Nitrogen, Phosphorus, Potassium, DATE_FORMAT(Timestamp, '%Y-%m-%d %h:%i %p') AS FormattedTimestamp FROM soil_moisture_data ORDER BY ID DESC LIMIT $resultsPerPage OFFSET $offset";
+        $sql = "SELECT ID, SoilMoisture, Nitrogen, Phosphorus, Potassium, DATE_FORMAT(Timestamp, '%Y-%m-%d %h:%i %p') AS FormattedTimestamp FROM soil_moisture_data ORDER BY Timestamp DESC LIMIT $resultsPerPage OFFSET $offset";
 
         echo '<table cellspacing="3" cellpadding="3">
               <tr> 
