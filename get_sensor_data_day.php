@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 $oneWeekAgo = date("Y-m-d", strtotime("-1 day"));
 
 // Modify your SQL query to select data for the last seven days
-$sql = "SELECT * FROM soil_moisture_data WHERE Timestamp >= '$oneWeekAgo' ORDER BY id ASC";
+$sql = "SELECT * FROM soil_moisture_data WHERE Timestamp >= '$oneWeekAgo' ORDER BY Timestamp ASC";
 
 $dataPoints = array();
 $data = array();
