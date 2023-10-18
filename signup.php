@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (!empty($username) && !empty($password) && !is_numeric($username)) {
         // Check if the username already exists
         $query = "SELECT * FROM users WHERE username = '$username'";
-        $result = mysqli_query($con, $query);
+        $result = mysqli_query($conn, $query);
 
         if (mysqli_num_rows($result) > 0) {
 			echo '<script>alert("Username already exists. Please choose a different username.");</script>';
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             // Username is unique, so save to the database
             $user_id = random_num(20);
             $query = "INSERT INTO users (username, password, email) VALUES ('$username', '$password', '$email')";
-            mysqli_query($con, $query);
+            mysqli_query($conn, $query);
             echo '<script>alert("Account successfully created"); setTimeout(function(){ window.location = "login.php"; }, 100);</script>';
 
             die;

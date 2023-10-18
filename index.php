@@ -1,17 +1,37 @@
 <?php 
 session_start();
 
+
 	include("connection.php");
 	include("functions.php");
 
-	$user_data = check_login($con);
+	$user_data = check_login($conn);
+
+    $minSoilMoisture = 30; // Set your desired soil moisture threshold
+    
+    function getAverageSoilMoistureForDay($conn) {
+        // Replace 'your_table_name' with the actual name of your database table
+        $oneWeekAgo = date("Y-m-d", strtotime("-1 year"));
+
+        $query = "SELECT AVG(SoilMoisture) AS avgSoilMoisture FROM soil_moisture_data WHERE  Timestamp >= '$oneWeekAgo' ORDER BY Timestamp ASC";
+
+        $result = mysqli_query($conn, $query);
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            return $row['avgSoilMoisture'];
+        }
+
+        return 0; // Default value if no data is available
+    }
+
+    $averageSoilMoisture = getAverageSoilMoistureForDay($conn);
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="images/favicon.png">
     <meta charset="UTF-8">
@@ -20,118 +40,191 @@ session_start();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="functions.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/hamburgers@1.2.1/index.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/hamburgers@1.2.1/dist/hamburgers.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
 </head>
 <body>
 
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="header">
-        <img class="logo" src="images/logo.png" alt="Logo">
-    <h2>
+            <div class="header">
+            <img class="logo" src="images/logo.png" alt="Logo">
+            <h2>SmartDilig</h2>
+        </div>
+            <a href="/SmartDilig">Dashboard</a>
+            <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
+            <a href="aboutus.php">About Us</a>
+            <a href="contactus.php">Contact Us</a>
+            <a href="logout.php">Logout</a>
+            
+        <button class="hamburger" type="button">
+        <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+        </span>
+        </button> 
+   
+    </div>
+    <!-- Sidebar -->
 
-        SmartDilig
-    </h2>
-    </div>
-        <a href="/SmartDilig">Dashboard</a>
-        <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
-        <a href="logout.php">Logout</a>
-    </div>
 
     <!-- Content -->
     <div class="content" id="contentContainer">
     <div class="clock">
+    <h5 class="dstatush">Device Status: <span class="dstatus offline"></span></h5>
 
- <h5 class="dstatus offline"></h5>
 
-
-    </script>
-        <div id="time"></div>
+     <div><?php echo $user_data['username']; ?></div>
         <?php if (isset($user_data['username'])) : ?>
-                <div><?php echo $user_data['username']; ?></div>
                 <?php endif; ?> 
+         <div id="time"></div>
     </div>
-
         <h1 class="welcome">SmartDilig Dashboard</h1>
 
-
         <div class="switchdiv">
-        Irrigation Switch:
-        <label class="switch">
-            <input type="checkbox" id="httpCheckbox">
-            <span class="slider"></span>
-        </label>
-    </div>
+    Irrigation Switch:
+    <label class="switch">
+        <input type="checkbox" id="httpCheckbox">
+        <span class="slider"></span>
+    </label>
+</div>
+<br>
+<div class="switchdiv">
+    Automated Irrigation Switch:
+    <label class="switch">
+        <input type="checkbox" id="automatedCheckbox">
+        <span class="slider"></span>
+    </label>
+</div>
 
-    <script>
-        const checkboxElement = document.getElementById("httpCheckbox");
-        const onUrl = "https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2&value=1";
-        const offUrl = "https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2&value=0";
-        const initialValueUrl = "https://sgp1.blynk.cloud/external/api/get?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2";
+<script>
+    const checkboxElement = document.getElementById("httpCheckbox");
+    const automatedCheckboxElement = document.getElementById("automatedCheckbox");
+    const onUrl = "https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2&value=1";
+    const offUrl = "https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2&value=0";
+    const initialValueUrl = "https://sgp1.blynk.cloud/external/api/get?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=2";
 
-        // Function to set the checkbox's value and send the request
-        function setCheckboxValue(value) {
-            checkboxElement.checked = value;
-            const url = value ? onUrl : offUrl;
-            sendHttpRequest(url);
+    const AonUrl = "https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=6&value=1";
+    const AoffUrl = "https://sgp1.blynk.cloud/external/api/update?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=6&value=0";
+    const AinitialValueUrl = "https://sgp1.blynk.cloud/external/api/get?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9&dataStreamId=6";
+
+    // Function to set the checkbox's value and send the request
+    function setCheckboxValue(value) {
+        checkboxElement.checked = value;
+        sendHttpRequest(value ? onUrl : offUrl);
+    }
+
+    function setAutomatedCheckboxValue(value) {
+        automatedCheckboxElement.checked = value;
+        sendHttpRequest(value ? AonUrl : AoffUrl);
+    }
+
+    console.log("Average Soil Moisture:", <?php echo $averageSoilMoisture; ?>);
+    console.log("Minimum Soil Moisture Threshold:", <?php echo $minSoilMoisture; ?>);
+
+
+// Fetch the initial value from AinitialValueUrl
+fetch(AinitialValueUrl, {
+    method: "GET",
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error("Network response was not ok");
+    }
+    return response.text();
+})
+.then(data => {
+    const isAutomated = data === "1"; // Check if the value is "1" for true, "0" for false
+
+    if (isAutomated) {
+        if (<?php echo $averageSoilMoisture; ?> < <?php echo $minSoilMoisture; ?>) {
+            console.log("Soil moisture is below the threshold, activating irrigation");
+            checkboxElement.checked = true;
+            sendHttpRequest(onUrl);
+            setTimeout(function () {
+                console.log("Turning off irrigation after 5 seconds");
+                checkboxElement.checked = false;
+                sendHttpRequest(offUrl);
+            }, 5000); 
+        } else {
+            console.log("Soil moisture is above the threshold, deactivating irrigation");
+            checkboxElement.checked = false;
+            sendHttpRequest(offUrl);
         }
+    } else {
+        // Handle the case when isAutomated is false
+        // Add any logic here if needed
+    }
+})
+.catch(error => {
+    console.error("Initial value retrieval error:", error);
+});
 
-        // Function to send the HTTP request
-        function sendHttpRequest(url) {
-            fetch(url, {
-                method: "GET",
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.text();
-            })
-            .then(data => {
-                console.log("HTTP request successful", data);
-            })
-            .catch(error => {
-                console.error("HTTP request error:", error);
-            });
-        }
 
-        // Function to get the initial value of the checkbox from the provided URL
-        function getInitialValue() {
-            fetch(initialValueUrl, {
-                method: "GET",
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.text();
-            })
-            .then(data => {
-                const initialValue = data === "1"; // Convert the response to a boolean
-                setCheckboxValue(initialValue);
-            })
-            .catch(error => {
-                console.error("Initial value retrieval error:", error);
-            });
-        }
 
-        // When the page loads, get the initial value of the checkbox
-        window.addEventListener("load", function() {
-            getInitialValue();
+    // Function to send the HTTP request
+    function sendHttpRequest(url) {
+        fetch(url, {
+            method: "GET",
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("HTTP request successful", data);
+        })
+        .catch(error => {
+            console.error("HTTP request error:", error);
         });
+    }
 
-        // Event listener for checkbox change
-        checkboxElement.addEventListener("change", function() {
-            const isOn = checkboxElement.checked;
-            setCheckboxValue(isOn ? 1 : 0); // Set the checkbox value and send the request
-        });
-    </script>
+    // Function to get the initial value of the checkbox from the provided URL
+// Function to get the initial value of the checkbox from the provided URL
+function getInitialValue(url, setFunction) {
+    fetch(url, {
+        method: "GET",
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.text();
+    })
+    .then(data => {
+        const initialValue = data === "1"; // Convert the response to a boolean
+        setFunction(initialValue);
+    })
+    .catch(error => {
+        console.error("Initial value retrieval error:", error);
+    });
+}
+
+// When the page loads, get the initial value of each checkbox separately
+window.addEventListener("load", function() {
+    getInitialValue(initialValueUrl, setCheckboxValue);
+    getInitialValue(AinitialValueUrl, setAutomatedCheckboxValue);
+});
+
+    // Event listener for checkbox change
+    checkboxElement.addEventListener("change", function() {
+        const isOn = checkboxElement.checked;
+        setCheckboxValue(isOn);
+    });
+
+    automatedCheckboxElement.addEventListener("change", function() {
+        const isAutomated = automatedCheckboxElement.checked;
+        setAutomatedCheckboxValue(isAutomated);
+    });
+</script>
 
 <div class="filters">
-    <h4 id="dayDataButton" onclick="setDataSource('day')"><a href="/SmartDilig">Show Daily Data </a></h4>
-    <h4 id="weekDataButton" onclick="setDataSource('week')"><a href="/SmartDilig">Show Weekly Data </a></h4>
-    <h4 id="monthDataButton" onclick="setDataSource('month')"><a href="/SmartDilig">Show Monthly Data</a></h4>
+    <h4 id="dayDataButton" class="h4filters" onclick="setDataSource('day')"><a href="/SmartDilig"><button class="button-3">Show Daily Data</button> </a></h4>
+    <h4 id="weekDataButton" class="h4filters" onclick="setDataSource('week')"><a href="/SmartDilig"><button class="button-3">Show Weekly Data</button></a></h4>
+    <h4 id="monthDataButton" class="h4filters" onclick="setDataSource('month')"><a href="/SmartDilig"><button class="button-3">Show Monthly Data</button></a></h4>
 </div>
     
 <div class="box1div">
@@ -156,8 +249,16 @@ session_start();
     <canvas id="line-chart"></canvas>
 </div>
 
-
 <script>
+const hamburgerButton = document.querySelector('.hamburger');
+const sidebar = document.querySelector('.sidebar');
+
+hamburgerButton.addEventListener('click', function() {
+  sidebar.classList.toggle('open');
+  hamburgerButton.classList.toggle('hamburger--collapse');
+  hamburgerButton.classList.toggle('is-active');
+});
+
 document.addEventListener("DOMContentLoaded", function () {
     const sensorDataLink = document.getElementById("sensorDataLink");
     const dayDataButton = document.getElementById("dayDataButton");
@@ -329,13 +430,12 @@ function setDataSource(dataSource) {
 
     // The "Sensor Data" link should work as expected without preventing default behavior
 });
-
-
-
 </script>
 
+<div class="insights-container">
 
-
+<h5 class="insighth5">Insights</h4>
+</div>
 </div>
 
 

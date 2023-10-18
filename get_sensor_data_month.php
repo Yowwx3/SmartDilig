@@ -1,10 +1,6 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "nodemcu test";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+	include("connection.php");
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

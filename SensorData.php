@@ -4,7 +4,7 @@ session_start();
 	include("connection.php");
 	include("functions.php");
 
-	$user_data = check_login($con);
+	$user_data = check_login($conn);
 
 ?>
 
@@ -14,7 +14,11 @@ session_start();
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
 <link rel="icon" type="image/x-icon" href="images/favicon.png">
-    <!--<meta http-equiv="refresh" content="5">-->
+<script src="functions.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hamburgers@1.2.1/index.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/hamburgers@1.2.1/dist/hamburgers.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
+
 <title> SmartDilig - Sensor Data </title>
 </head>
 
@@ -22,69 +26,51 @@ session_start();
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="header">
-        <img class="logo" src="images/logo.png" alt="Logo">
-    <h2>
-        SmartDilig
-    </h2>
+            <div class="header">
+            <img class="logo" src="images/logo.png" alt="Logo">
+            <h2>SmartDilig</h2>
+        </div>
+            <a href="/SmartDilig">Dashboard</a>
+            <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
+            <a href="aboutus.php">About Us</a>
+            <a href="contactus.php">Contact Us</a>
+            <a href="logout.php">Logout</a>
+            
+        <button class="hamburger" type="button">
+        <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+        </span>
+        </button> 
+        <script>
+      const hamburgerButton = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+
+    hamburgerButton.addEventListener('click', function() {
+      sidebar.classList.toggle('open');
+      hamburgerButton.classList.toggle('hamburger--collapse');
+      hamburgerButton.classList.toggle('is-active');
+    });
+    </script>
     </div>
-        <a href="/SmartDilig">Dashboard</a>
-        <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
-        <a href="logout.php">Logout</a>
-    </div>
+
+
+
     <div class="content" id="contentContainer">
     <div class="clock">
-    <script>
-    // Function to update the status text and font color
-    function updateStatus() {
-      var statusElement = document.querySelector('.dstatus');
-      var apiUrl = "https://sgp1.blynk.cloud/external/api/isHardwareConnected?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9";
-
-      // Make a GET request
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          if (data === true) {
-            statusElement.textContent = "Online";
-            statusElement.classList.remove("offline");
-            statusElement.classList.add("online");
-          } else {
-            statusElement.textContent = "Offline";
-            statusElement.classList.remove("online");
-            statusElement.classList.add("offline");
-          }
-        })
-        .catch(error => {
-          console.error("Error fetching data:", error);
-          statusElement.textContent = "Offline"; // Set to "Offline" in case of an error
-          statusElement.classList.remove("online");
-          statusElement.classList.add("offline");
-        });
-    }
-
-    // Call the function when the page loads
-    window.onload = updateStatus;
-  </script>
- <h5 class="dstatus offline"></h5>
+    <h5 class="dstatush">Device Status: <span class="dstatus offline"></span></h5>
 
 
-    </script>
-        <div id="time"></div>
-        <script src="functions.js"></script>
+     <div><?php echo $user_data['username']; ?></div>
         <?php if (isset($user_data['username'])) : ?>
-                <div><?php echo $user_data['username']; ?></div>
                 <?php endif; ?> 
+         <div id="time"></div>
     </div>
+
 
   
         <h2 class="welcome">SENSOR DATA</h2>
         <?php
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "nodemcu test";
-
-        $conn = new mysqli($servername, $username, $password, $dbname);
+	      include("connection.php");
 
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
@@ -97,16 +83,15 @@ session_start();
         // Calculate the OFFSET for SQL query
         $offset = ($currentPage - 1) * $resultsPerPage;
 
-        $sql = "SELECT ID, SoilMoisture, Nitrogen, Phosphorus, Potassium, DATE_FORMAT(Timestamp, '%Y-%m-%d %h:%i %p') AS FormattedTimestamp FROM soil_moisture_data ORDER BY Timestamp DESC LIMIT $resultsPerPage OFFSET $offset";
+        $sql = "SELECT ID, SoilMoisture, Nitrogen, Phosphorus, Potassium, DATE_FORMAT(DATE_ADD(Timestamp, INTERVAL 8 HOUR), '%Y-%m-%d %h:%i %p') AS FormattedTimestamp FROM soil_moisture_data ORDER BY Timestamp DESC LIMIT $resultsPerPage OFFSET $offset";
 
         echo '<table cellspacing="3" cellpadding="3">
               <tr> 
-                <th>ID</th> 
+                <th>Time & Date</th> 
                 <th>Soil Moisture</th> 
                 <th>Nitrogen</th> 
                 <th>Phosphorus</th> 
                 <th>Potassium</th> 
-                <th>Time & Date</th>       
               </tr>';
         
               if ($result = $conn->query($sql)) {
@@ -120,12 +105,12 @@ session_start();
             
             
                     echo '<tr> 
-                            <td>' . $row_id . '</td> 
+                            <td>' . $row_Timestamp . '</td>  
                             <td>' . $row_SoilMoisture . '</td>
                             <td>' . $row_Nitrogen . '</td>
                             <td>' . $row_Phosphorus . '</td>
                             <td>' . $row_Potassium . '</td>
-                            <td>' . $row_Timestamp . '</td> 
+
                           </tr>';
                 }
                 $result->free();
