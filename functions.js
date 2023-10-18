@@ -1,5 +1,3 @@
-
-// Function to update the status text and font color
 function updateStatus() {
   var statusElement = document.querySelector('.dstatus');
   var apiUrl = "https://sgp1.blynk.cloud/external/api/isHardwareConnected?token=l6UeRMI9Lq0ueGPznxI1oFRylpzQdpE9";
@@ -45,5 +43,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Call the updateClock function to display the current time
   setInterval(updateClock, 1000);
   updateClock(); // Call it once to display the time immediately
+});
+
+window.addEventListener('load', function () {
+  document.body.classList.add('loaded');
 });
 
