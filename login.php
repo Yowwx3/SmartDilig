@@ -54,9 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         <img class="logo" src="images/logo.png" alt="Logo">
         <h2>SmartDilig</h2>
     </div>
-        <a href="aboutus.php">About Us</a>
-        <a href="contactus.php">Contact Us</a>
-        <a href="login.php">Login</a>
+        <a href="aboutus.php"><img src="images/aboutus.png" class="navicon">About Us</a>
+        <a href="contactus.php"><img src="images/contactus.png" class="navicon">Contact Us</a>
+        <a href="login.php"><img src="images/login.png" class="navicon">Login</a>
         
     <button class="hamburger" type="button">
     <span class="hamburger-box">

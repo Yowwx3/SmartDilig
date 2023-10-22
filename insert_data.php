@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $value3 = test_input($_POST["value3"]);
         $value4 = test_input($_POST["value4"]);
 
-        if ($value1 == 255 || $value2 == 255 || $value3 == 255 || $value4 == 255) {
+        if ($value1 == 255 || $value2 == 255 || $value3 == 255 || $value4 == 255 || $value1 == 0 || $value2 == 0 || $value3 == 0 || $value4 == 0) {
             echo "Error: Value 255 is not allowed.";
         } else {
             $conn = new mysqli($servername, $username, $password, $dbname);

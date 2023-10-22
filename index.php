@@ -11,7 +11,7 @@ session_start();
     
     function getAverageSoilMoistureForDay($conn) {
         // Replace 'your_table_name' with the actual name of your database table
-        $oneWeekAgo = date("Y-m-d", strtotime("-1 year"));
+        $oneWeekAgo = date("Y-m-d", strtotime("-1 day"));
 
         $query = "SELECT AVG(SoilMoisture) AS avgSoilMoisture FROM soil_moisture_data WHERE  Timestamp >= '$oneWeekAgo' ORDER BY Timestamp ASC";
 
@@ -53,11 +53,11 @@ session_start();
             <img class="logo" src="images/logo.png" alt="Logo">
             <h2>SmartDilig</h2>
         </div>
-            <a href="/SmartDilig">Dashboard</a>
-            <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
-            <a href="aboutus.php">About Us</a>
-            <a href="contactus.php">Contact Us</a>
-            <a href="logout.php">Logout</a>
+            <a href="/"><img src="images/dashboard.png" class="navicon">Dashboard</a>
+            <a href="SensorData.php" id="sensorDataLink"><img src="images/sensor.png" class="navicon">Sensor Data</a>
+            <a href="aboutus.php"><img src="images/aboutus.png" class="navicon">About Us</a>
+            <a href="contactus.php"><img src="images/contactus.png" class="navicon">Contact Us</a>
+            <a href="logout.php"><img src="images/logout.png" class="navicon">Logout</a>
             
         <button class="hamburger" type="button">
         <span class="hamburger-box">
@@ -136,21 +136,27 @@ fetch(AinitialValueUrl, {
 })
 .then(data => {
     const isAutomated = data === "1"; // Check if the value is "1" for true, "0" for false
+    
 
     if (isAutomated) {
-        if (<?php echo $averageSoilMoisture; ?> < <?php echo $minSoilMoisture; ?>) {
+        if (<?php if (!isset($averageSoilMoisture)) { $averageSoilMoisture = 0;} echo $averageSoilMoisture; ?> < <?php echo $minSoilMoisture; ?>) {
+            setTimeout(function () {
             console.log("Soil moisture is below the threshold, activating irrigation");
             checkboxElement.checked = true;
             sendHttpRequest(onUrl);
+        }, 1000); 
             setTimeout(function () {
                 console.log("Turning off irrigation after 5 seconds");
                 checkboxElement.checked = false;
                 sendHttpRequest(offUrl);
             }, 5000); 
         } else {
+            setTimeout(function () {
             console.log("Soil moisture is above the threshold, deactivating irrigation");
             checkboxElement.checked = false;
             sendHttpRequest(offUrl);
+        }, 5000); 
+
         }
     } else {
         // Handle the case when isAutomated is false
@@ -431,11 +437,130 @@ function setDataSource(dataSource) {
     // The "Sensor Data" link should work as expected without preventing default behavior
 });
 </script>
-
 <div class="insights-container">
+    <h5 class="insighth5">Insights</h5>
+    <div>
+    <?php
 
-<h5 class="insighth5">Insights</h4>
+    function getAverageSoilMoistureForWeek($conn) {
+        // Replace 'your_table_name' with the actual name of your database table
+        $oneWeekAgo = date("Y-m-d", strtotime("-1 week"));
+
+        $query = "SELECT AVG(SoilMoisture) AS avgSoilMoisture FROM soil_moisture_data WHERE  Timestamp >= '$oneWeekAgo' ORDER BY Timestamp ASC";
+
+        $result = mysqli_query($conn, $query);
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            return $row['avgSoilMoisture'];
+        }
+
+        return 0; // Default value if no data is available
+    }
+
+    // Check the average soil moisture level
+    $averageSoilMoisture = getAverageSoilMoistureForWeek($conn);
+
+    // Provide insights and recommendations based on the data
+    if ($averageSoilMoisture < $minSoilMoisture) {
+        echo "<p>Your soil's average moisture level is currently below the recommended threshold. This indicates that your soil may be too dry for optimal plant growth.</p>";
+        echo "<p>Recommendations:</p>";
+        echo "<ul>";
+        echo "<li>Consider increasing the frequency of irrigation to maintain adequate soil moisture.</li>";
+        echo "<li>Monitor soil moisture levels regularly and adjust irrigation accordingly.</li>";
+        echo "</ul>";
+    } else {
+        echo "<p>Your soil's average moisture level is within the recommended range for most crops. This is favorable for plant growth.</p>";
+        echo "<p>Recommendations:</p>";
+        echo "<ul>";
+        echo "<li>Continue monitoring soil moisture to ensure it stays within the desired range.</li>";
+        echo "<li>Be cautious not to overwater, as excess moisture can lead to root rot and other issues.</li>";
+        echo "</ul>";
+    }
+    ?>
+   <?php
+include("connection.php"); // Include your database connection script
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$oneWeekAgo = date("Y-m-d", strtotime("-1 week"));
+
+// Modify your SQL query to select data for the last seven days
+$sql = "SELECT AVG(Nitrogen) AS averageNitrogen, AVG(Phosphorus) AS averagePhosphorus, AVG(Potassium) AS averagePotassium
+        FROM soil_moisture_data
+        WHERE Timestamp >= '$oneWeekAgo'";
+
+if ($result = $conn->query($sql)) {
+    $row = $result->fetch_assoc();
+
+    echo "<p>Your soil's average NPK levels for the past week:</p>";
+    echo "<ul>";
+    echo "<li>Average Nitrogen: " . number_format($row['averageNitrogen'], 2) . " mg/kg</li>";
+    echo "<li>Average Phosphorus: " . number_format($row['averagePhosphorus'], 2) . " mg/kg</li>";
+    echo "<li>Average Potassium: " . number_format($row['averagePotassium'], 2) . " mg/kg</li>";
+    echo "</ul>";
+
+    echo "<p>Recommendations:</p>";
+    echo "<ul>";
+
+    if ($row['averageNitrogen'] >= 12.5 && $row['averagePhosphorus'] >= 14.875 && $row['averagePotassium'] >= 15.5) {
+        echo "<li>The current average NPK levels are Above Optimal. Your soil is already rich in nutrients, so consider postponing fertilization for a while.</li>";
+        echo "<li>Excess Nitrogen can lead to excessive foliage growth and reduce fruit or flower production.</li>";
+        echo "<li>Excess Phosphorus may lead to nutrient imbalances and environmental issues.</li>";
+        echo "<li>Excess Potassium can interfere with the uptake of other nutrients by the plants.</li>";
+    } else {
+        if ($row['averageNitrogen'] < 4.5) {
+            echo "<li>Consider increasing Nitrogen content in your fertilizer as the average Nitrogen level is Low. Inadequate Nitrogen can result in stunted growth and pale, yellowing leaves.</li>";
+        } elseif ($row['averageNitrogen'] >= 4.5 && $row['averageNitrogen'] <= 12.5) {
+            echo "<li>The current average Nitrogen level is Optimal.</li>";
+        } else {
+            echo "<li>The current average Nitrogen level is Above Optimal. Excess Nitrogen can lead to excessive foliage growth and reduce fruit or flower production.</li>";
+        }
+    
+        if ($row['averagePhosphorus'] < 6.875) {
+            echo "<li>Consider increasing Phosphorus content in your fertilizer as the average Phosphorus level is Low. Insufficient Phosphorus can result in poor root development and delayed flowering.</li>";
+        } elseif ($row['averagePhosphorus'] >= 6.875 && $row['averagePhosphorus'] <= 14.875) {
+            echo "<li>The current average Phosphorus level is Optimal.</li>";
+        } else {
+            echo "<li>The current average Phosphorus level is Above Optimal. Excess Phosphorus may lead to nutrient imbalances and environmental issues.</li>";
+        }
+    
+        if ($row['averagePotassium'] < 7.5) {
+            echo "<li>Consider increasing Potassium content in your fertilizer as the average Potassium level is Low. Insufficient Potassium can result in weak stems and poor fruit quality.</li>";
+        } elseif ($row['averagePotassium'] >= 7.5 && $row['averagePotassium'] <= 15.5) {
+            echo "<li>The current average Potassium level is Optimal.</li>";
+        } else {
+            echo "<li>The current average Potassium level is Above Optimal. Excess Potassium can interfere with the uptake of other nutrients by the plants.</li>";
+        }
+    }
+    
+    echo "<li>If your crops are fruiting (e.g., tomatoes, peppers, and eggplants), consider increasing phosphorus and potassium levels during the fruiting stage.</li>";
+    echo "<li>Regularly monitor soil nutrient levels and adjust fertilization as needed based on crop growth stages.</li>";
+    echo "</ul>";
+
+    $result->free();
+} else {
+    echo "Failed to execute the SQL query: " . $conn->error;
+}
+
+$conn->close();
+?>
+<p>Notes:</p>
+<ul>
+    <li>Optimal NPK (Nitrogen, Phosphorus, and Potassium) levels in the soil are essential for healthy plant growth and crop production.</li>
+    <li>Nitrogen (N) is crucial for leafy green growth and overall plant vigor. Inadequate Nitrogen can lead to stunted growth.</li>
+    <li>Phosphorus (P) is essential for root development, flowering, and fruiting. Low Phosphorus levels may result in poor fruit production.</li>
+    <li>Potassium (K) is vital for plant stress resistance and disease prevention. Insufficient Potassium can make plants more susceptible to stress and diseases.</li>
+    <li>Regularly monitoring and maintaining optimal NPK levels in your soil helps ensure healthy crops and better yields.</li>
+</ul>
+
+    </div>
 </div>
+
+
+
 </div>
 
 

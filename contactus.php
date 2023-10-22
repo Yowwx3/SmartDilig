@@ -143,24 +143,24 @@ session_start();
     <?php
     if (isset($_SESSION['id'])) {
         // The user is logged in, so display these links
-        echo '<a href="/SmartDilig">Dashboard</a>';
-        echo '<a href="SensorData.php" id="sensorDataLink">Sensor Data</a>';
+        echo '<a href="/"><img src="images/dashboard.png" class="navicon">Dashboard</a>';
+        echo '<a href="SensorData.php" id="sensorDataLink"><img src="images/sensor.png" class="navicon">Sensor Data</a>';
     }
     ?>
 
-    <a href="aboutus.php">About Us</a>
-    <a href="contactus.php">Contact Us</a>
+    <a href="aboutus.php"><img src="images/aboutus.png" class="navicon">About Us</a>
+    <a href="contactus.php"><img src="images/contactus.png" class="navicon">Contact Us</a>
 
     <?php
     if (!isset($_SESSION['id'])) {
         // The user is logged in, so display the "Logout" link
-        echo '<a href="login.php">Login</a>';
+        echo '<a href="login.php"><img src="images/login.png" class="navicon">Login</a>';
     }
     ?>
     <?php
     if (isset($_SESSION['id'])) {
         // The user is logged in, so display the "Logout" link
-        echo '<a href="logout.php">Logout</a>';
+        echo '<a href="logout.php"><img src="images/logout.png" class="navicon">Logout</a>';
     }
     ?>
 

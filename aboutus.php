@@ -80,9 +80,14 @@ session_start();
             height: 520px;
             text-align: center;
         }
+        .mascot {
+            width: 600px;
+            height: 300px;
+            text-align: center;
+        }
 
         /* Responsive styles for smaller screens */
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 890px) {
             p{
             font-size: 15px;
             text-align: justify;
@@ -93,6 +98,10 @@ session_start();
             }
 
             .featuresimg {
+                width: 100%; /* 100% width for smaller screens */
+                height: auto; /* Allow height to adjust automatically */
+            }
+            .mascot {
                 width: 100%; /* 100% width for smaller screens */
                 height: auto; /* Allow height to adjust automatically */
             }
@@ -116,24 +125,24 @@ session_start();
     <?php
     if (isset($_SESSION['id'])) {
         // The user is logged in, so display these links
-        echo '<a href="/SmartDilig">Dashboard</a>';
-        echo '<a href="SensorData.php" id="sensorDataLink">Sensor Data</a>';
+        echo '<a href="/"><img src="images/dashboard.png" class="navicon">Dashboard</a>';
+        echo '<a href="SensorData.php" id="sensorDataLink"><img src="images/sensor.png" class="navicon">Sensor Data</a>';
     }
     ?>
 
-        <a href="aboutus.php">About Us</a>
-        <a href="contactus.php">Contact Us</a>
+        <a href="aboutus.php"><img src="images/aboutus.png" class="navicon">About Us</a>
+        <a href="contactus.php"><img src="images/contactus.png" class="navicon">Contact Us</a>
 
     <?php
     if (!isset($_SESSION['id'])) {
         // The user is logged in, so display the "Logout" link
-        echo '<a href="login.php">Login</a>';
+        echo '<a href="login.php"><img src="images/login.png" class="navicon">Login</a>';
     }
     ?>
     <?php
     if (isset($_SESSION['id'])) {
         // The user is logged in, so display the "Logout" link
-        echo '<a href="logout.php">Logout</a>';
+        echo '<a href="logout.php"><img src="images/logout.png" class="navicon">Logout</a>';
     }
     ?>
         
@@ -188,6 +197,7 @@ session_start();
 
         </p>
         <h2 class="history">Why choose us?</h2>
+        <div class="img-div"> <img class="mascot" src="images/mascot.png" ></div>
         <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sustainable Agriculture Smart Irrigation with Soil Quality Monitoring System offers a comprehensive and forward-thinking approach 
             that tackles the problems with conventional agricultural methods while fostering sustainability, effectiveness, and environmental
              responsibility.

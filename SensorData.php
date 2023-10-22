@@ -30,11 +30,11 @@ session_start();
             <img class="logo" src="images/logo.png" alt="Logo">
             <h2>SmartDilig</h2>
         </div>
-            <a href="/SmartDilig">Dashboard</a>
-            <a href="SensorData.php" id="sensorDataLink">Sensor Data</a>
-            <a href="aboutus.php">About Us</a>
-            <a href="contactus.php">Contact Us</a>
-            <a href="logout.php">Logout</a>
+            <a href="/"><img src="images/dashboard.png" class="navicon">Dashboard</a>
+            <a href="SensorData.php" id="sensorDataLink"><img src="images/sensor.png" class="navicon">Sensor Data</a>
+            <a href="aboutus.php"><img src="images/aboutus.png" class="navicon">About Us</a>
+            <a href="contactus.php"><img src="images/contactus.png" class="navicon">Contact Us</a>
+            <a href="logout.php"><img src="images/logout.png" class="navicon">Logout</a>
             
         <button class="hamburger" type="button">
         <span class="hamburger-box">

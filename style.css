@@ -68,15 +68,22 @@ td {
     font-size: 18px;
     color: #fff; /* White text color for better contrast */
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     transition: background-color 0.3s; /* Add a transition on background-color */
 }
 
-.sidebar a:hover {
-  background-color: #3c4e77; /* Slightly darker blue-gray on hover */
+.sidebar a {
+  transition: transform 0.3s ease; /* Add a smooth transition for the transform property */
 }
 
+.sidebar a:hover {
+  background-color: #3c4e77; /* Slightly darker blue-gray on hover */
+  transform: translateX(5px); /* Move the element 5 pixels to the left on hover */
+  border-radius: 5px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+
+}
 
 /* Content styles */
 @keyframes contentAnimation {
@@ -473,12 +480,22 @@ input:checked + .slider
     margin: auto;
     margin-top: 20px;
     width: 90%;
-    height: 500px !important;
     padding-bottom: 40px;
     background-color: #F5F8ED;
 
   }
+  
+  .insights-container div{
+    padding: 25px;
+  }
 
+  .navicon{
+    width: 30px;
+    margin-right: 7px;
+    height: auto;
+    filter: invert(100%);
+  }
+  
   .chart-container h5{
     margin-block-start: 5px;
     margin-block-end: 5px;
@@ -491,7 +508,7 @@ input:checked + .slider
     text-align: center;
   }
 
-  @media screen and (max-width: 1630px) {
+  @media screen and (max-width: 1830px) {
     .switchdiv{
       margin: 0 300px;
       }
@@ -589,23 +606,61 @@ input:checked + .slider
   /* Show the <a> tags when the sidebar has the "open" class */
   .sidebar.open a {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     text-align: center;
-  }
+}
 
 
   .sidebar a {
     padding: 15px;
   }
+
+  .insights-container{
+    padding: 0;
+    border-radius: 5px;
+    border: 1px solid;
+    margin: auto;
+    margin-top: 20px;
+    width: 100%;
+    padding-bottom: 40px;
+    background-color: #F5F8ED;
+
+  }
+
 }
 
+@media screen and (max-width: 480px) {
+  .box {
+    padding: 5px;
+    margin: 10px;
+    width: 150px;
+    font-size: 1.1rem;
+
+}
+  }
+
+  @media screen and (max-width: 364px) {
+    .box {
+      padding: 4px;
+      margin: 5px;
+      width: 130px;
+      font-size: 1.1rem;
+  
+  }
+    }
 
 @media screen and (max-width: 331px) {
   .switchdiv{
     margin: 0 0px;
   }
 
+  .box {
+    padding: 2px;
+    margin: 2px;
+    width: 110px;
+    font-size: 1rem;
 
+}
 
 }  
 

@@ -1,10 +1,10 @@
 <?php
 // INTEGRATION TEST FOR SENSOR DATA
 $data = array(
-    'value1' => '69',      // Replace with your actual data
-    'value2' => '34',      // Replace with your actual data
-    'value3' => '12',      // Replace with your actual data
-    'value4' => '17',      // Replace with your actual data
+    'value1' => '69',      // Replace with any test data
+    'value2' => '34',      
+    'value3' => '12',      
+    'value4' => '17',      
 );
 
 $url = 'https://smartdilig.passionatepanda.online/insert_data.php';
